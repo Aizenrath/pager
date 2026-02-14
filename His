@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send to Her 💌</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        body { font-family: -apple-system, sans-serif; background-color: #fce4ec; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; text-align: center; }
+        textarea { width: 100%; height: 100px; padding: 15px; margin: 15px 0; border-radius: 8px; border: 1px solid #ccc; resize: none; font-size: 16px; box-sizing: border-box;}
+        button { background-color: #e91e63; color: white; border: none; padding: 15px 20px; width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        button:active { background-color: #c2185b; }
+        #status { margin-top: 15px; font-weight: bold; color: #e91e63; min-height: 20px; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Send to Her Pager 💌</h2>
+        <textarea id="messageBox" placeholder="Type something sweet..."></textarea>
+        <button id="sendBtn">Send Message</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        // ⚠️ YOUR KEYS GO HERE
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyN_Auw8-Btynl_NuE-HK8KmzyEzJzcx0",
+            authDomain: "love-pager-27704.firebaseapp.com",
+            databaseURL: "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "love-pager-27704",
+            storageBucket: "love-pager-27704.firebasestorage.app",
+            messagingSenderId: "1060168327621",
+            appId: "1:1060168327621:web:189061de4b7732ed0aabac"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            const msg = document.getElementById('messageBox').value;
+            const statusText = document.getElementById('status');
+            
+            if (!msg) { statusText.innerText = "Please type a message first!"; return; }
+            statusText.innerText = "Sending...";
+
+            // Writes to HER device
+            database.ref('LovePagers/HerDevice').set({
+                message: msg, timestamp: Date.now(), new_message_alert: true 
+            }).then(() => {
+                statusText.innerText = "Sent to her successfully! ❤️";
+                document.getElementById('messageBox').value = ''; 
+            }).catch((error) => { statusText.innerText = "Error: " + error.message; });
+        });
+    </script>
+</body>
+</html>
