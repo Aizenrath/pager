@@ -3,59 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send to Her 💌</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Kostas's Portal</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background-color: #fce4ec; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; text-align: center; }
-        textarea { width: 100%; height: 100px; padding: 15px; margin: 15px 0; border-radius: 8px; border: 1px solid #ccc; resize: none; font-size: 16px; box-sizing: border-box;}
-        button { background-color: #e91e63; color: white; border: none; padding: 15px 20px; width: 100%; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        button:active { background-color: #c2185b; }
-        #status { margin-top: 15px; font-weight: bold; color: #e91e63; min-height: 20px; }
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 450px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid #007bff; }
+        h2 { text-align: center; color: #333; margin-bottom: 5px; }
+        h4 { text-align: center; color: #666; margin-top: 0; margin-bottom: 20px; font-weight: normal; }
+        .section { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; }
+        label { font-weight: bold; margin-top: 10px; display: block; font-size: 14px;}
+        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; margin-top: 10px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Send to Her Pager 💌</h2>
-        <textarea id="messageBox" placeholder="Type something sweet..."></textarea>
-        <button id="sendBtn">Send Message</button>
-        <p id="status"></p>
+<div class="container">
+    <h2>Kostas's Portal 🛰️</h2>
+    <h4>Send to Depi</h4>
+    
+    <div class="section">
+        <label>My Pager's Title (Updates YOUR screen):</label>
+        <input type="text" id="myTitle" value="Kostas">
+
+        <label>My Current City:</label>
+        <input type="text" id="myCity" value="Athens">
     </div>
 
-    <script>
-        // ⚠️ YOUR KEYS GO HERE
-        const firebaseConfig = {
-            apiKey: "AIzaSyDyN_Auw8-Btynl_NuE-HK8KmzyEzJzcx0",
-            authDomain: "love-pager-27704.firebaseapp.com",
-            databaseURL: "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "love-pager-27704",
-            storageBucket: "love-pager-27704.firebasestorage.app",
-            messagingSenderId: "1060168327621",
-            appId: "1:1060168327621:web:189061de4b7732ed0aabac"
-        };
+    <div class="section">
+        <label>Message for Depi:</label>
+        <textarea id="messageBox" rows="4" placeholder="Type your message for her..."></textarea>
+    </div>
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+    <button onclick="processAndSend()" id="sendBtn">Sync Settings & Send Message</button>
 
-        document.getElementById('sendBtn').addEventListener('click', () => {
-            const msg = document.getElementById('messageBox').value;
-            const statusText = document.getElementById('status');
-            
-            if (!msg) { statusText.innerText = "Please type a message first!"; return; }
-            statusText.innerText = "Sending...";
+    <div id="status"></div>
+</div>
 
-            // Writes to HER device
-            database.ref('LovePagers/HerDevice').set({
-                message: msg, timestamp: Date.now(), new_message_alert: true 
-            }).then(() => {
-                statusText.innerText = "Sent to her successfully! ❤️";
-                document.getElementById('messageBox').value = ''; 
-            }).catch((error) => { statusText.innerText = "Error: " + error.message; });
-        });
-    </script>
+<script>
+    const myUrl = "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app/LovePagers/HisDevice.json";
+    const herUrl = "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app/LovePagers/HerDevice.json";
+
+    async function getCoords(city) {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`);
+        const data = await res.json();
+        if(data.length > 0) return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+        return null;
+    }
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        return Math.round(R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))));
+    }
+
+    async function processAndSend() {
+        const title = document.getElementById("myTitle").value;
+        const city = document.getElementById("myCity").value;
+        const msg = document.getElementById("messageBox").value;
+        const statusDiv = document.getElementById("status");
+        const btn = document.getElementById("sendBtn");
+
+        if(msg.trim() === "" || city.trim() === "" || title.trim() === "") {
+            statusDiv.style.color = "red"; statusDiv.innerText = "Please fill in all fields!"; return;
+        }
+
+        btn.disabled = true;
+        statusDiv.style.color = "blue";
+        statusDiv.innerText = "Locating Depi & calculating distance...";
+
+        try {
+            // 1. Secretly peek at Her database to find out what city she is in
+            let herCity = "London"; // Fallback just in case
+            const peekRes = await fetch(herUrl);
+            const peekData = await peekRes.json();
+            if(peekData && peekData.my_city) { herCity = peekData.my_city; }
+
+            // 2. Get GPS coords for both cities
+            const loc1 = await getCoords(city);
+            const loc2 = await getCoords(herCity);
+
+            if(!loc1 || !loc2) {
+                statusDiv.style.color = "red"; statusDiv.innerText = "Could not find one of the cities!";
+                btn.disabled = false; return;
+            }
+
+            // 3. Calculate Math
+            const distanceKm = getDistance(loc1.lat, loc1.lon, loc2.lat, loc2.lon);
+            statusDiv.innerText = `Distance: ${distanceKm} km. Sending...`;
+
+            // 4. Update YOUR settings (Title, City, Distance)
+            const myPayload = { pager_title: title, my_city: city, distance_km: distanceKm.toString() };
+            await fetch(myUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(myPayload) });
+
+            // 5. Update HER pager (Message, Distance, Alert)
+            const herPayload = { message: msg, distance_km: distanceKm.toString(), new_message_alert: true };
+            await fetch(herUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(herPayload) });
+
+            statusDiv.style.color = "green";
+            statusDiv.innerText = `Success! Sent to Depi (${distanceKm}km away).`;
+            document.getElementById("messageBox").value = ""; 
+        } catch (error) {
+            statusDiv.style.color = "red"; statusDiv.innerText = "Error syncing with pagers.";
+        }
+        btn.disabled = false;
+    }
+</script>
 </body>
 </html>
