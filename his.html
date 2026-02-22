@@ -28,15 +28,15 @@
         <input type="text" id="myTitle" value="Kostas">
 
         <label>My Current City:</label>
-        <input type="text" id="myCity" value="Athens">
+        <input type="text" id="myCity" value="Athens, Greece">
     </div>
 
     <div class="section">
-        <label>Message for Depi:</label>
-        <textarea id="messageBox" rows="4" placeholder="Type your message for her..."></textarea>
+        <label>Message for Depi (Optional):</label>
+        <textarea id="messageBox" rows="4" placeholder="Leave blank to just update settings..."></textarea>
     </div>
 
-    <button onclick="processAndSend()" id="sendBtn">Sync Settings & Send Message</button>
+    <button onclick="processAndSend()" id="sendBtn">Sync Settings & Send</button>
 
     <div id="status"></div>
 </div>
@@ -67,8 +67,9 @@
         const statusDiv = document.getElementById("status");
         const btn = document.getElementById("sendBtn");
 
-        if(msg.trim() === "" || city.trim() === "" || title.trim() === "") {
-            statusDiv.style.color = "red"; statusDiv.innerText = "Please fill in all fields!"; return;
+        // Allow empty messages! Only check if Title and City are filled out.
+        if(city.trim() === "" || title.trim() === "") {
+            statusDiv.style.color = "red"; statusDiv.innerText = "Please fill in your Title and City!"; return;
         }
 
         btn.disabled = true;
@@ -76,13 +77,11 @@
         statusDiv.innerText = "Locating Depi & calculating distance...";
 
         try {
-            // 1. Secretly peek at Her database to find out what city she is in
-            let herCity = "London"; // Fallback just in case
+            let herCity = "London, UK"; 
             const peekRes = await fetch(herUrl);
             const peekData = await peekRes.json();
             if(peekData && peekData.my_city) { herCity = peekData.my_city; }
 
-            // 2. Get GPS coords for both cities
             const loc1 = await getCoords(city);
             const loc2 = await getCoords(herCity);
 
@@ -91,20 +90,23 @@
                 btn.disabled = false; return;
             }
 
-            // 3. Calculate Math
             const distanceKm = getDistance(loc1.lat, loc1.lon, loc2.lat, loc2.lon);
-            statusDiv.innerText = `Distance: ${distanceKm} km. Sending...`;
+            statusDiv.innerText = `Distance: ${distanceKm} km. Syncing...`;
 
-            // 4. Update YOUR settings (Title, City, Distance)
+            // Update YOUR settings 
             const myPayload = { pager_title: title, my_city: city, distance_km: distanceKm.toString() };
             await fetch(myUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(myPayload) });
 
-            // 5. Update HER pager (Message, Distance, Alert)
-            const herPayload = { message: msg, distance_km: distanceKm.toString(), new_message_alert: true };
+            // Update HER pager (Only send message trigger if text exists)
+            const herPayload = { distance_km: distanceKm.toString() };
+            if (msg.trim() !== "") {
+                herPayload.message = msg;
+                herPayload.new_message_alert = true;
+            }
             await fetch(herUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(herPayload) });
 
             statusDiv.style.color = "green";
-            statusDiv.innerText = `Success! Sent to Depi (${distanceKm}km away).`;
+            statusDiv.innerText = msg.trim() !== "" ? `Success! Message sent (${distanceKm}km away).` : `Success! Settings synced (${distanceKm}km away).`;
             document.getElementById("messageBox").value = ""; 
         } catch (error) {
             statusDiv.style.color = "red"; statusDiv.innerText = "Error syncing with pagers.";
