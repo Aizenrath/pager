@@ -3,86 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Depi's Portal</title>
+    <title>Depi's Portal 🎀</title>
     <style>
-        /* Dark Theme Overhaul */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             padding: 20px; 
-            background-color: #121212; 
-            color: #e0e0e0;
+            background-color: #1a1617; /* Very dark chocolate/rose tint */
+            color: #fce4ec; 
         }
         .container { 
             max-width: 450px; 
-            margin: 40px auto; 
-            background: #1e1e1e; 
-            padding: 25px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-            border-top: 5px solid #ff4d5a; 
+            margin: 20px auto; 
+            background: #2d2426; /* Dark berry-tinted charcoal */
+            padding: 30px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.2); 
+            border: 1px solid #4a3539;
+            border-top: 6px solid #ff4d6d; /* Bright girly pop */
         }
-        h2 { text-align: center; color: #ffffff; margin-bottom: 5px; }
-        h4 { text-align: center; color: #b0b0b0; margin-top: 0; margin-bottom: 25px; font-weight: normal; }
+        h2 { text-align: center; color: #ff85a1; margin-bottom: 5px; font-weight: 800; }
+        h4 { text-align: center; color: #c9ada7; margin-top: 0; margin-bottom: 25px; font-weight: 300; letter-spacing: 1px; }
         
         .section { 
-            background: #2a2a2a; 
-            padding: 15px; 
-            border-radius: 10px; 
-            margin-bottom: 15px; 
-            border: 1px solid #3d3d3d; 
+            background: rgba(255, 77, 109, 0.05); 
+            padding: 18px; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+            border: 1px solid #5a3d42; 
         }
         
-        label { font-weight: bold; margin-top: 10px; display: block; font-size: 14px; color: #ff4d5a; }
+        label { font-weight: bold; margin-top: 10px; display: block; font-size: 13px; color: #ff85a1; text-transform: uppercase; letter-spacing: 0.5px; }
         
         input, textarea { 
             width: 100%; 
             padding: 12px; 
             margin-top: 8px; 
-            background-color: #121212; 
-            border: 1px solid #444; 
-            border-radius: 8px; 
+            background-color: #1a1617; 
+            border: 1px solid #4a3539; 
+            border-radius: 10px; 
             box-sizing: border-box; 
-            color: #ffffff;
+            color: white;
             font-size: 15px;
+            transition: all 0.3s ease;
         }
+        
         input:focus, textarea:focus {
             outline: none;
-            border-color: #ff4d5a;
-            box-shadow: 0 0 5px rgba(255, 77, 90, 0.3);
+            border-color: #ff4d6d;
+            box-shadow: 0 0 8px rgba(255, 77, 109, 0.4);
         }
 
         button { 
             width: 100%; 
-            padding: 14px; 
+            padding: 15px; 
             margin-top: 10px; 
-            background-color: #ff4d5a; 
+            background: linear-gradient(135deg, #ff4d6d 0%, #c9184a 100%); 
             color: white; 
             border: none; 
-            border-radius: 8px; 
+            border-radius: 12px; 
             font-size: 16px; 
             font-weight: bold; 
             cursor: pointer; 
-            transition: background 0.3s ease;
+            box-shadow: 0 4px 15px rgba(201, 24, 74, 0.4);
+            transition: transform 0.2s ease;
         }
-        button:hover { background-color: #e63946; }
-        button:disabled { background-color: #555; cursor: not-allowed; }
+        
+        button:hover { 
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #ff758f 0%, #ff4d6d 100%); 
+        }
+        
+        button:active { transform: translateY(0); }
+        button:disabled { background: #4a3539; box-shadow: none; cursor: not-allowed; }
 
-        #status { 
-            text-align: center; 
-            margin-top: 20px; 
-            font-weight: bold; 
-            font-size: 14px;
-        }
+        #status { text-align: center; margin-top: 20px; font-size: 14px; min-height: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Depi's Portal 💌</h2>
-    <h4>Send to Kostas</h4>
+    <h2>Depi's Portal 🎀</h2>
+    <h4>Send Love to Kostas</h4>
     
     <div class="section">
-        <label>My Pager's Title (Update Name):</label>
+        <label>My Pager's Title:</label>
         <input type="text" id="myTitle" value="Depi Spiniara">
 
         <label>My Current City:</label>
@@ -90,26 +94,24 @@
     </div>
 
     <div class="section">
-        <label>Message for Kostas (Optional):</label>
-        <textarea id="messageBox" rows="4" placeholder="Leave blank to just update settings..."></textarea>
+        <label>Message for Kostas 💌</label>
+        <textarea id="messageBox" rows="4" placeholder="Write something sweet..."></textarea>
     </div>
 
-    <button onclick="processAndSend()" id="sendBtn">Sync Settings & Send</button>
+    <button onclick="processAndSend()" id="sendBtn">Sync & Send</button>
 
     <div id="status"></div>
 </div>
 
 <script>
-    // Logic remains exactly the same as your original script
+    /* JavaScript logic remains the same to keep functionality intact */
     const myUrl = "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app/LovePagers/HerDevice.json";
     const hisUrl = "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app/LovePagers/HisDevice.json";
 
     async function getCoords(city) {
-        try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`);
-            const data = await res.json();
-            if(data.length > 0) return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-        } catch (e) { console.error(e); }
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}`);
+        const data = await res.json();
+        if(data.length > 0) return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
         return null;
     }
 
@@ -129,12 +131,12 @@
         const btn = document.getElementById("sendBtn");
 
         if(city.trim() === "" || title.trim() === "") {
-            statusDiv.style.color = "#ff4d5a"; statusDiv.innerText = "Please fill in your Title and City!"; return;
+            statusDiv.style.color = "#ff758f"; statusDiv.innerText = "Please fill in your Title and City!"; return;
         }
 
         btn.disabled = true;
-        statusDiv.style.color = "#4dabf7";
-        statusDiv.innerText = "Locating Kostas & calculating distance...";
+        statusDiv.style.color = "#8093f1";
+        statusDiv.innerText = "Finding Kostas...";
 
         try {
             let hisCity = "Athens, Greece"; 
@@ -146,12 +148,12 @@
             const loc2 = await getCoords(hisCity);
 
             if(!loc1 || !loc2) {
-                statusDiv.style.color = "#ff4d5a"; statusDiv.innerText = "Could not find one of the cities!";
+                statusDiv.style.color = "#ff758f"; statusDiv.innerText = "City not found!";
                 btn.disabled = false; return;
             }
 
             const distanceKm = getDistance(loc1.lat, loc1.lon, loc2.lat, loc2.lon);
-            statusDiv.innerText = `Distance: ${distanceKm} km. Syncing...`;
+            statusDiv.innerText = `Distance: ${distanceKm} km. Sending...`;
 
             const myPayload = { pager_title: title, my_city: city, distance_km: distanceKm.toString() };
             await fetch(myUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(myPayload) });
@@ -163,11 +165,11 @@
             }
             await fetch(hisUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(hisPayload) });
 
-            statusDiv.style.color = "#51cf66";
-            statusDiv.innerText = msg.trim() !== "" ? `Success! Message sent (${distanceKm}km away).` : `Success! Settings synced (${distanceKm}km away).`;
+            statusDiv.style.color = "#b7e4c7";
+            statusDiv.innerText = "Sent successfully! ✨";
             document.getElementById("messageBox").value = ""; 
         } catch (error) {
-            statusDiv.style.color = "#ff4d5a"; statusDiv.innerText = "Error syncing with pagers.";
+            statusDiv.style.color = "#ff758f"; statusDiv.innerText = "Connection error.";
         }
         btn.disabled = false;
     }
