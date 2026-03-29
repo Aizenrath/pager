@@ -5,16 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kostas's Portal</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
-        .container { max-width: 450px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 5px solid #007bff; }
-        h2 { text-align: center; color: #333; margin-bottom: 5px; }
-        h4 { text-align: center; color: #666; margin-top: 0; margin-bottom: 20px; font-weight: normal; }
-        .section { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; }
-        label { font-weight: bold; margin-top: 10px; display: block; font-size: 14px;}
-        input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; margin-top: 10px; background-color: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        #status { text-align: center; margin-top: 15px; font-weight: bold; }
+        /* Dark Theme Overhaul for Kostas */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            padding: 20px; 
+            background-color: #0d1117; 
+            color: #c9d1d9;
+        }
+        .container { 
+            max-width: 450px; 
+            margin: 40px auto; 
+            background: #161b22; 
+            padding: 25px; 
+            border-radius: 16px; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6); 
+            border-top: 5px solid #00a2ff; 
+        }
+        h2 { text-align: center; color: #ffffff; margin-bottom: 5px; }
+        h4 { text-align: center; color: #8b949e; margin-top: 0; margin-bottom: 25px; font-weight: normal; }
+        
+        .section { 
+            background: #21262d; 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin-bottom: 15px; 
+            border: 1px solid #30363d; 
+        }
+        
+        label { font-weight: bold; margin-top: 10px; display: block; font-size: 14px; color: #58a6ff; }
+        
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 8px; 
+            background-color: #0d1117; 
+            border: 1px solid #30363d; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            color: #f0f6fc;
+            font-size: 15px;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 5px rgba(88, 166, 255, 0.3);
+        }
+
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            margin-top: 10px; 
+            background-color: #238636; /* Green for "Send/Sync" action */
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: background 0.2s ease;
+        }
+        /* Overriding button to the Blue theme if you prefer blue over green */
+        #sendBtn { background-color: #007bff; }
+        #sendBtn:hover { background-color: #00a2ff; }
+        #sendBtn:disabled { background-color: #484f58; cursor: not-allowed; }
+
+        #status { 
+            text-align: center; 
+            margin-top: 20px; 
+            font-weight: bold; 
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -67,13 +127,12 @@
         const statusDiv = document.getElementById("status");
         const btn = document.getElementById("sendBtn");
 
-        // Allow empty messages! Only check if Title and City are filled out.
         if(city.trim() === "" || title.trim() === "") {
-            statusDiv.style.color = "red"; statusDiv.innerText = "Please fill in your Title and City!"; return;
+            statusDiv.style.color = "#f85149"; statusDiv.innerText = "Please fill in your Title and City!"; return;
         }
 
         btn.disabled = true;
-        statusDiv.style.color = "blue";
+        statusDiv.style.color = "#58a6ff";
         statusDiv.innerText = "Locating Depi & calculating distance...";
 
         try {
@@ -86,18 +145,16 @@
             const loc2 = await getCoords(herCity);
 
             if(!loc1 || !loc2) {
-                statusDiv.style.color = "red"; statusDiv.innerText = "Could not find one of the cities!";
+                statusDiv.style.color = "#f85149"; statusDiv.innerText = "Could not find one of the cities!";
                 btn.disabled = false; return;
             }
 
             const distanceKm = getDistance(loc1.lat, loc1.lon, loc2.lat, loc2.lon);
             statusDiv.innerText = `Distance: ${distanceKm} km. Syncing...`;
 
-            // Update YOUR settings 
             const myPayload = { pager_title: title, my_city: city, distance_km: distanceKm.toString() };
             await fetch(myUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(myPayload) });
 
-            // Update HER pager (Only send message trigger if text exists)
             const herPayload = { distance_km: distanceKm.toString() };
             if (msg.trim() !== "") {
                 herPayload.message = msg;
@@ -105,11 +162,11 @@
             }
             await fetch(herUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(herPayload) });
 
-            statusDiv.style.color = "green";
+            statusDiv.style.color = "#3fb950";
             statusDiv.innerText = msg.trim() !== "" ? `Success! Message sent (${distanceKm}km away).` : `Success! Settings synced (${distanceKm}km away).`;
             document.getElementById("messageBox").value = ""; 
         } catch (error) {
-            statusDiv.style.color = "red"; statusDiv.innerText = "Error syncing with pagers.";
+            statusDiv.style.color = "#f85149"; statusDiv.innerText = "Error syncing with pagers.";
         }
         btn.disabled = false;
     }
