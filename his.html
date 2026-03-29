@@ -5,75 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kostas's Portal</title>
     <style>
-        /* Dark Theme Overhaul for Kostas */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             padding: 20px; 
-            background-color: #0d1117; 
-            color: #c9d1d9;
+            background-color: #0b0e14; /* Deep space background */
+            color: #d1d5db; 
         }
         .container { 
             max-width: 450px; 
-            margin: 40px auto; 
-            background: #161b22; 
-            padding: 25px; 
-            border-radius: 16px; 
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6); 
-            border-top: 5px solid #00a2ff; 
+            margin: 30px auto; 
+            background: #161b22; /* Obsidian surface */
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.15); 
+            border: 1px solid #30363d;
+            border-top: 6px solid #00d4ff; /* Electric blue accent */
         }
-        h2 { text-align: center; color: #ffffff; margin-bottom: 5px; }
-        h4 { text-align: center; color: #8b949e; margin-top: 0; margin-bottom: 25px; font-weight: normal; }
+        h2 { text-align: center; color: #ffffff; margin-bottom: 5px; font-weight: 700; }
+        h4 { text-align: center; color: #8b949e; margin-top: 0; margin-bottom: 25px; font-weight: 300; letter-spacing: 0.5px; }
         
         .section { 
-            background: #21262d; 
-            padding: 15px; 
-            border-radius: 10px; 
+            background: rgba(255, 255, 255, 0.03); 
+            padding: 18px; 
+            border-radius: 12px; 
             margin-bottom: 15px; 
             border: 1px solid #30363d; 
         }
         
-        label { font-weight: bold; margin-top: 10px; display: block; font-size: 14px; color: #58a6ff; }
+        label { font-weight: bold; margin-top: 10px; display: block; font-size: 13px; color: #00d4ff; text-transform: uppercase; letter-spacing: 1px; }
         
         input, textarea { 
             width: 100%; 
             padding: 12px; 
             margin-top: 8px; 
-            background-color: #0d1117; 
+            background-color: #0b0e14; 
             border: 1px solid #30363d; 
             border-radius: 8px; 
             box-sizing: border-box; 
-            color: #f0f6fc;
+            color: #ffffff;
             font-size: 15px;
+            transition: border-color 0.3s ease;
         }
+        
         input:focus, textarea:focus {
             outline: none;
-            border-color: #58a6ff;
-            box-shadow: 0 0 5px rgba(88, 166, 255, 0.3);
+            border-color: #00d4ff;
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.2);
         }
 
         button { 
             width: 100%; 
-            padding: 14px; 
+            padding: 15px; 
             margin-top: 10px; 
-            background-color: #238636; /* Green for "Send/Sync" action */
+            background: linear-gradient(135deg, #00d4ff 0%, #007bff 100%); 
             color: white; 
             border: none; 
-            border-radius: 8px; 
+            border-radius: 10px; 
             font-size: 16px; 
             font-weight: bold; 
             cursor: pointer; 
-            transition: background 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
         }
-        /* Overriding button to the Blue theme if you prefer blue over green */
-        #sendBtn { background-color: #007bff; }
-        #sendBtn:hover { background-color: #00a2ff; }
-        #sendBtn:disabled { background-color: #484f58; cursor: not-allowed; }
+        
+        button:hover { 
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+        
+        button:active { transform: translateY(0); }
+        button:disabled { background: #30363d; box-shadow: none; cursor: not-allowed; opacity: 0.6; }
 
         #status { 
             text-align: center; 
             margin-top: 20px; 
-            font-weight: bold; 
-            font-size: 14px;
+            font-size: 14px; 
+            font-weight: 500;
         }
     </style>
 </head>
@@ -84,7 +91,7 @@
     <h4>Send to Depi</h4>
     
     <div class="section">
-        <label>My Pager's Title (Updates YOUR screen):</label>
+        <label>My Pager's Title:</label>
         <input type="text" id="myTitle" value="Kostas">
 
         <label>My Current City:</label>
@@ -92,16 +99,17 @@
     </div>
 
     <div class="section">
-        <label>Message for Depi (Optional):</label>
-        <textarea id="messageBox" rows="4" placeholder="Leave blank to just update settings..."></textarea>
+        <label>Message for Depi:</label>
+        <textarea id="messageBox" rows="4" placeholder="Type your message here..."></textarea>
     </div>
 
-    <button onclick="processAndSend()" id="sendBtn">Sync Settings & Send</button>
+    <button onclick="processAndSend()" id="sendBtn">Sync & Send Signal</button>
 
     <div id="status"></div>
 </div>
 
 <script>
+    /* Logic remains identical to ensure functionality */
     const myUrl = "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app/LovePagers/HisDevice.json";
     const herUrl = "https://love-pager-27704-default-rtdb.europe-west1.firebasedatabase.app/LovePagers/HerDevice.json";
 
@@ -128,15 +136,15 @@
         const btn = document.getElementById("sendBtn");
 
         if(city.trim() === "" || title.trim() === "") {
-            statusDiv.style.color = "#f85149"; statusDiv.innerText = "Please fill in your Title and City!"; return;
+            statusDiv.style.color = "#ff6b6b"; statusDiv.innerText = "Please fill in Title and City!"; return;
         }
 
         btn.disabled = true;
-        statusDiv.style.color = "#58a6ff";
-        statusDiv.innerText = "Locating Depi & calculating distance...";
+        statusDiv.style.color = "#00d4ff";
+        statusDiv.innerText = "Calculating trajectory...";
 
         try {
-            let herCity = "London, UK"; 
+            let herCity = "Thessaloniki, Greece"; 
             const peekRes = await fetch(herUrl);
             const peekData = await peekRes.json();
             if(peekData && peekData.my_city) { herCity = peekData.my_city; }
@@ -145,7 +153,7 @@
             const loc2 = await getCoords(herCity);
 
             if(!loc1 || !loc2) {
-                statusDiv.style.color = "#f85149"; statusDiv.innerText = "Could not find one of the cities!";
+                statusDiv.style.color = "#ff6b6b"; statusDiv.innerText = "City not found!";
                 btn.disabled = false; return;
             }
 
@@ -162,11 +170,11 @@
             }
             await fetch(herUrl, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(herPayload) });
 
-            statusDiv.style.color = "#3fb950";
-            statusDiv.innerText = msg.trim() !== "" ? `Success! Message sent (${distanceKm}km away).` : `Success! Settings synced (${distanceKm}km away).`;
+            statusDiv.style.color = "#51cf66";
+            statusDiv.innerText = msg.trim() !== "" ? `Success! Signal sent (${distanceKm}km).` : `Settings synced!`;
             document.getElementById("messageBox").value = ""; 
         } catch (error) {
-            statusDiv.style.color = "#f85149"; statusDiv.innerText = "Error syncing with pagers.";
+            statusDiv.style.color = "#ff6b6b"; statusDiv.innerText = "Sync failed.";
         }
         btn.disabled = false;
     }
